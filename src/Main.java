@@ -41,6 +41,11 @@ public class Main {
             int totalLinesCount = 0;
             int yandexBotCount = 0;
             int googleBotCount = 0;
+            long totalTraffic = 0;
+            Statistics statistics = new Statistics();
+
+            String[] allLineFragments;
+            String[] lineBotsFragments;
 
             try {
 
@@ -54,8 +59,8 @@ public class Main {
                     }
                     totalLinesCount++;
 
-                    String[] userAgent = (line.split("\""));
-                    String userAgentInfo = userAgent[userAgent.length - 1];
+                    lineBotsFragments = (line.split("\""));
+                    String userAgentInfo = lineBotsFragments[lineBotsFragments.length - 1];
                     String firstBrackets = userAgentInfo.replaceAll(".*\\(|\\).*", "");
                     String[] parts = firstBrackets.split(";");
                     if (parts.length >= 2) {
@@ -68,6 +73,10 @@ public class Main {
                             googleBotCount++;
                         }
                     }
+                    allLineFragments = line.split(" ");
+                    LogEntry logEntry = new LogEntry(allLineFragments);
+                    totalTraffic += logEntry.getResponseSize();
+                    statistics.addEntry(logEntry);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -77,11 +86,20 @@ public class Main {
             System.out.println("**********");
             System.out.println("Количество строк в файле, соответствующих запросам от YandexBot: " + yandexBotCount);
             System.out.println("Доля запросов от YandexBot относительно общего числа сделанных запросов: " +
-                    String.format("%.4f", ((double) yandexBotCount / totalLinesCount) * 100) + " %");
+                    String.format("%,.4f", ((double) yandexBotCount / totalLinesCount) * 100) + " %");
             System.out.println("**********");
             System.out.println("Количество строк в файле, соответствующих запросам от Googlebot: " + googleBotCount);
             System.out.println("Доля запросов от Googlebot относительно общего числа сделанных запросов: " +
                     String.format("%,.4f", ((double) googleBotCount / totalLinesCount) * 100) + " %");
+            System.out.println("**********");
+            System.out.println("Минимальное время в файле: " + statistics.getMinTime());
+            System.out.println("Максимальное время в файле: " + statistics.getMaxTime());
+            System.out.println("Разница между максимальным и минимальным временем в часах: "
+                    + (statistics.getMaxTime().getHour() - statistics.getMinTime().getHour()));
+            System.out.println("**********");
+            System.out.println("Общее количество траффика: " + totalTraffic);
+            System.out.println("Среднее количество траффика за час " + statistics.getTrafficRate(totalTraffic));
+
         }
     }
 }
