@@ -10,6 +10,7 @@ public class Main {
 
     public static void finder() {
 
+        String line;
         int fileCounter = 0;
         int findCounter = 0;
 
@@ -37,34 +38,50 @@ public class Main {
             System.out.println("Путь указан верно. Это файл " + path + " с номером " + fileCounter);
             System.out.println("Выполнено попыток поиска: " + findCounter);
 
+            int totalLinesCount = 0;
+            int yandexBotCount = 0;
+            int googleBotCount = 0;
+
             try {
-                int minLineLength = Integer.MAX_VALUE;
-                int maxLineLength = 0;
-                int totalLinesCount = 0;
 
                 FileReader fileReader = new FileReader(path);
                 BufferedReader reader = new BufferedReader(fileReader);
-                String line;
 
                 while ((line = reader.readLine()) != null) {
                     int length = line.length();
                     if (length > 1024) {
                         throw new RuntimeException("Длина строки в файле более 1024 символов");
                     }
-                    if (length > maxLineLength) {
-                        maxLineLength = length;
-                    }
-                    if (length < minLineLength) {
-                        minLineLength = length;
-                    }
                     totalLinesCount++;
+
+                    String[] userAgent = (line.split("\""));
+                    String userAgentInfo = userAgent[userAgent.length - 1];
+                    String firstBrackets = userAgentInfo.replaceAll(".*\\(|\\).*", "");
+                    String[] parts = firstBrackets.split(";");
+                    if (parts.length >= 2) {
+                        String fragment = parts[1];
+                        String botName = fragment.trim().split("/")[0];
+
+                        if (botName.equals("YandexBot")) {
+                            yandexBotCount++;
+                        } else if (botName.equals("Googlebot")) {
+                            googleBotCount++;
+                        }
+                    }
                 }
-                System.out.println("Общее количество строк в файле: " + totalLinesCount);
-                System.out.println("Длина самой длинной строки в файле: " + maxLineLength);
-                System.out.println("Длина самой короткой строки в файле: " + minLineLength);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+            System.out.println("**********");
+            System.out.println("Общее количество строк в файле: " + totalLinesCount);
+            System.out.println("**********");
+            System.out.println("Количество строк в файле, соответствующих запросам от YandexBot: " + yandexBotCount);
+            System.out.println("Доля запросов от YandexBot относительно общего числа сделанных запросов: " +
+                    String.format("%.4f", ((double) yandexBotCount / totalLinesCount) * 100) + " %");
+            System.out.println("**********");
+            System.out.println("Количество строк в файле, соответствующих запросам от Googlebot: " + googleBotCount);
+            System.out.println("Доля запросов от Googlebot относительно общего числа сделанных запросов: " +
+                    String.format("%,.4f", ((double) googleBotCount / totalLinesCount) * 100) + " %");
         }
     }
 }
