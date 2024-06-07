@@ -97,8 +97,12 @@ public class Main {
             System.out.println("Разница между максимальным и минимальным временем в часах: "
                     + (statistics.getMaxTime().getHour() - statistics.getMinTime().getHour()));
             System.out.println("**********");
-            System.out.println("Общее количество траффика: " + totalTraffic);
-            System.out.println("Среднее количество траффика за час " + statistics.getTrafficRate(totalTraffic));
+            System.out.println("Общее количество траффика за час: " + Statistics.getTrafficRate());
+            System.out.println("Среднее количество посещений за час: " + Statistics.getAverageVisitsPerHour());
+            System.out.println("Среднее количество ошибок за час: " + Statistics.getAverageErrorResponsePerHour());
+            System.out.println("Среднее количество посещений одним пользователем: " + Statistics.getAverageVisitsPerUser());
+            System.out.println("Максимальное количество запросов в секунду: " + Statistics.getMaximumRequestsPerSecond());
+            System.out.println("Максимальное количество визитов одним пользователем: " + Statistics.getMaximumVisitsPerUser());
 
         }
     }
